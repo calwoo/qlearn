@@ -22,5 +22,20 @@ def circuit(params):
     # compute expectation value of pauli z-operator
     return qml.expval(qml.PauliZ(0))
 
-# evaluate circuit
-print(circuit([0.54, 0.12]))
+# gradient
+dcircuit = qml.grad(circuit, argnum=0)
+
+def cost(x):
+    return circuit(x)
+
+# optimize
+params = np.array([0.011, 0.012])
+opt = qml.GradientDescentOptimizer(stepsize=0.4)
+steps = 100
+
+for i in range(steps):
+    params = opt.step(cost, params)
+    if (i+1) % 5 == 0:
+        print(f"epoch {i+1} cost: {cost(params)}")
+
+print(f"trained params: {params}")
